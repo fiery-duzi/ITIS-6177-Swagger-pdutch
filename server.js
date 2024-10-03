@@ -33,6 +33,15 @@ app.use(express.json())
 app.use(cors())
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs))
 
+app.get('/say', check('keyword').notEmpty().escape(), async(req, res) => {
+    const result = validationResult(req);
+    if(result.isEmpty()) {
+        const lambdaRes = await fetch('https://y5uzwqgyee.execute-api.us-east-1.amazonaws.com/say?keyword=' + req.query.keyword)
+        return res.send(await lambdaRes.text())
+    }
+    res.send({errors: result.array()});
+})
+
 /**
  * @swagger
  * /agents:
